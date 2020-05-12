@@ -19,9 +19,10 @@
       rel="stylesheet"
     />
 
+    <!-- link for jquery's UI css-->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     
-
+    <!-- personal css -->
     <link rel="stylesheet" href="style.css" />
     <title>Work Day Scheduler</title>
   </head>
@@ -32,19 +33,20 @@
       <p class="lead">A simple calendar app for scheduling your work day</p>
       <p id="currentDay" class="lead"></p>
       <section>
-          <label for="timeStart">Time Start: </label><input type="number" id="timeStart" />
-          <label for="timeEnd">Time Start: </label><input type="number" id="timeEnd" min="1" max="" />
-          <div id="slider-range"></div>
+          Shift Time: <input type="text" id="timeStart" style="border:0;width:50px;text-justify:auto;" readonly />&nbsp;to&nbsp;
+          <input type="text" id="timeEnd" style="border:0;width:50px;" readonly />
+          <div id="slider-range" style="width:90%;"></div>
       </section>
     </header>
     <div class="container">
       <!-- Timeblocks go here -->
     </div>
 
-    
+    <!-- script sources -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-    <script src="script.js"></script>
+    <script src="scripts/func.js"></script>
+    <script src="scripts/script.js"></script>
   </body>
 </html>

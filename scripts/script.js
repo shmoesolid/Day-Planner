@@ -1,4 +1,11 @@
 
+// setup storage object for saving/loading data
+var storage = 
+{
+    timeSlots: new Array(25), // 25 indexes for 0 to 24 indicating our hours in military
+    timeStart: 9,
+    timeEnd: 17
+};
 
 // element references
 var currentDayElm = $('#currentDay');
@@ -14,19 +21,26 @@ timeSliderElm.slider
     range: true,
     min: 0,
     max: 24,
-    values: [ 9, 17 ],
+    values: [ storage.timeStart, storage.timeEnd ],
 
     // setup event for setting inputs when slider changes
     slide: function( event, ui )
     {
-        timeStartElm.val(ui.values[ 0 ]);
-        timeEndElm.val(ui.values[ 1 ]);
+        var startValue = _convertTo12Hour(ui.values[ 0 ]);
+        var endValue = _convertTo12Hour(ui.values[ 1 ]);
+
+        timeStartElm.val(startValue[0] + startValue[1]);
+        timeEndElm.val(endValue[0] + endValue[1]);
+
+        // adjust timeslots
     }
 });
 
 // prime values of number inputs with current slider values
-timeStartElm.val( timeSliderElm.slider( "values", 0 ) );
-timeEndElm.val( timeSliderElm.slider("values", 1 ));
+var startValue = _convertTo12Hour(timeSliderElm.slider( "values", 0 ));
+var endValue = _convertTo12Hour(timeSliderElm.slider("values", 1 ));
+timeStartElm.val( startValue[0] + startValue[1] );
+timeEndElm.val( endValue[0] + endValue[1] );
 
 // get current date/time
 var now = moment();
@@ -40,36 +54,13 @@ currentDayElm.text(now.format("MMMM Do YYYY"));
 // setup event for changing time within start/end time inputs to have slider match
 // TODO..
 
-function _convertTo12Hour(number)
-{
-    // setup return array
-    var array = [ parseInt(number), "am"];
-
-    // error if not a number
-    if (isNaN(array[0])) return false;
-
-    // convert to standard, but don't set if we are at 24 (below handles this)
-    if (number > 12 && number < 24) 
-    {
-        array[0] -= 12;
-        array[1] = "pm";
-    }
-
-    // finalize
-    if (array[0] == 0 || array[0] == 24) 
-        array[0] = 12;
-
-    // return array
-    return array;
-}
-
 // loads up schedule
 function loadSchedule()
 {
     for (let i = 0; i < 25; i++) 
     {
-        //const element = array[i];
         
+
         
     }
 }
