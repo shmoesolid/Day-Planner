@@ -34,13 +34,13 @@
       <p id="currentDay" class="lead"></p>
       <section>
           Shift Time: <input type="text" id="timeStart" style="border:0;width:50px;text-justify:auto;" readonly />&nbsp;to&nbsp;
-          <input type="text" id="timeEnd" style="border:0;width:50px;" readonly />
-          <div id="slider-range" style="width:90%;"></div>
+          <input type="text" id="timeEnd" style="border:0;width:50px;" readonly /><br />
+          <div id="slider-range"></div>
       </section>
     </header>
-    <div class="container">
-      <!-- Timeblocks go here -->
-    </div>
+
+    <!-- dynamic time blocks container-->
+    <div id="timeContainer" class="container" ></div>
 
     <!-- script sources -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
