@@ -105,7 +105,7 @@ function createTimeslot(index, insertBefore = false)
 function removeTimeslot(index)
 {
     // simple enough
-    $(index).remove();
+    $("#"+index).remove();
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -114,17 +114,55 @@ function removeTimeslot(index)
  */
 function initTimeslots()
 {
+    // empty container
+    containerElm.text("");
+
     // go through all our time slots
     for (let i = 0; i < 25; i++) 
     {
         // check if within our time
         if (i >= storage.timeStart && i <= storage.timeEnd)
         {
+            createTimeslot(i).text( storage.timeSlots[i] );
             // create the slot
-            var textarea = createTimeslot(i);
+            //var textarea = createTimeslot(i);
 
             // add text if we have anything
-            textarea.text( (storage.timeSlots[i]) ? storage.timeSlots[i] : "" );
+            //textarea.text( storage.timeSlots[i] );
         }
     }
+}
+
+/////////////////////////////////////////////////////////////////////////
+/** simply removes listeners from class then resets it back
+ * 
+ * this is for when timeslots are dynamically removed and
+ * created from slider, forces our new button in slot 
+ * to have listener
+ * 
+ */
+function resetButtonListeners()
+{
+    // turning off listeners
+    $(".saveBtn").off("click");
+
+    // setup listener for save button(s)
+    $(".saveBtn").on("click", function()
+    {
+        // get parent aka time slot
+        var parent = $(this).parent();
+
+        // get time slot index from parent id of button
+        var timeIndex = parent.attr('id');
+        console.log(timeIndex);
+
+        var input = parent.children('textarea');
+        console.log(input.val());
+
+        // set storage time slot text
+        storage.timeSlots[ timeIndex ] = input.val();
+
+        // save them
+        saveStorageVars(SAVE_NAME, storage);
+    });
 }

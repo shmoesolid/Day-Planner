@@ -1,6 +1,9 @@
 
+
+
 // setup unique local save/load namespace
 const SAVE_NAME = "SK_DAY_PLANNER";
+//localStorage.removeItem(SAVE_NAME); // DEBUG
 
 // get current date/time
 var now = moment();
@@ -8,13 +11,13 @@ var now = moment();
 // setup default storage object for saving/loading data
 var storage = 
 {
-    timeSlots: new Array(25), // 25 indexes for 0 to 24 indicating our hours in military
+    timeSlots: new Array(25).fill(""), // 25 indexes for 0 to 24 indicating our hours in military
     timeStart: 9, // 9am
     timeEnd: 17, // 5pm
     date: now // this date is for comparison of storage to now
 };
 
-// attempt to load from storage
+// attempt to load from local storage
 storage = loadStorageVars(SAVE_NAME, storage);
 
 // element references
@@ -32,19 +35,65 @@ timeSliderElm.slider
     min: 0, max: 24,
     values: [ storage.timeStart, storage.timeEnd ],
 
-    // setup event for setting inputs when slider changes
+    // setup event for slider changes
     slide: function( event, ui )
     {
+        // update storage vars
+        storage.timeStart = ui.values[ 0 ];
+        storage.timeEnd = ui.values[ 1 ];
+
+        // save vars
+        saveStorageVars(SAVE_NAME, storage);
+
         // get time conversion data
-        var startValue = _convertTo12Hour(ui.values[ 0 ]);
-        var endValue = _convertTo12Hour(ui.values[ 1 ]);
+        var startValue = _convertTo12Hour( storage.timeStart );
+        var endValue = _convertTo12Hour( storage.timeEnd );
 
         // set display input values utilizing data
         timeStartElm.val(startValue[0] + startValue[1]);
         timeEndElm.val(endValue[0] + endValue[1]);
 
-        // adjust timeslots here
-        // TODO..
+        // adjust timeslots below..
+        // it is complicated magic from here on out
+
+        // get first and last id/index of time slots displayed
+        var allSlotElms = $('.row');
+        var firstIndex = parseInt(allSlotElms.first().attr('id'));
+        var lastIndex = parseInt(allSlotElms.last().attr('id'));
+
+        // prime some vars
+        var diff = curIndex = 0;
+        var adding = before = false;
+
+        // change in first
+        if ( (diff = (firstIndex - parseInt(storage.timeStart))) !== 0 )
+        {
+            //initTimeslots(); // TEMPORARY
+            curIndex = firstIndex;
+            if (diff > 0) adding = before = true;
+            diff *= -1; // reverse the difference since we are before
+        }
+
+        // change in last
+        else if ( (diff = (parseInt(storage.timeEnd) - lastIndex)) !== 0 )
+        {
+            //initTimeslots(); // TEMPORARY
+            curIndex = lastIndex;
+            if (diff > 0) adding = true;
+        }
+
+        // ..
+        while (diff !== 0)
+        {
+            var modifier = (diff/Math.abs(diff));
+            var nextIndex = curIndex + modifier;
+
+            if (adding) createTimeslot(nextIndex, before).text( storage.timeSlots[nextIndex] );
+            else removeTimeslot(curIndex);
+
+            diff -= modifier;
+            curIndex = nextIndex;
+        }
     }
 });
 
@@ -60,18 +109,8 @@ currentDayElm.text(now.format("MMMM Do YYYY"));
 //console.log(now.format("H")); // returns current time in 24 hour format without leading 0
 //console.log(_convertTo12Hour(now.format("H")));
 
+// initialize our time slots
 initTimeslots();
 
-// setup listener for save button(s)
-$(".saveBtn").on("click", function()
-{
-    // get parent aka time slot
-    var parent = $(this).parent();
-
-    // get time slot index from parent id of button
-    var timeIndex = parent.attr('id');
-
-    // ..
-    // parent
-    // storage.timeSlots[ timeIndex ] = 
-});
+// reset button listeners
+resetButtonListeners();
