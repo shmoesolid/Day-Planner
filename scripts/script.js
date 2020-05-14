@@ -126,5 +126,8 @@ initTimeslots();
 // reset button listeners
 resetButtonListeners();
 
+// setup other listener (a test to see firefox local issues, but no go)
+window.addEventListener("beforeunload", function() { saveStorageVars(SAVE_NAME, storage) });
+
 //console.log(now.format("H")); // returns current time in 24 hour format without leading 0
 //console.log(_convertTo12Hour(now.format("H")));
