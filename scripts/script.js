@@ -55,6 +55,9 @@ timeSliderElm.slider
 
         // adjust timeslots below..
         // it is complicated magic from here on out
+        // was simply re-initializing timeslots but 
+        // i don't like doing things that way
+        //initTimeslots();
 
         // get first and last id/index of time slots displayed
         var allSlotElms = $('.row');
@@ -68,31 +71,33 @@ timeSliderElm.slider
         // change in first
         if ( (diff = (firstIndex - parseInt(storage.timeStart))) !== 0 )
         {
-            //initTimeslots(); // TEMPORARY
-            curIndex = firstIndex;
-            if (diff > 0) adding = before = true;
-            diff *= -1; // reverse the difference since we are before
+            curIndex = firstIndex; // set our current index to first
+            if (diff > 0) adding = before = true; // we are adding before
+            diff *= -1; // reverse the difference now since we are before
         }
 
         // change in last
         else if ( (diff = (parseInt(storage.timeEnd) - lastIndex)) !== 0 )
         {
-            //initTimeslots(); // TEMPORARY
-            curIndex = lastIndex;
-            if (diff > 0) adding = true;
+            curIndex = lastIndex; // set our current index to last
+            if (diff > 0) adding = true; // we are adding after
         }
 
-        // ..
+        // moving slider too quickly can cause big jumps in difference
+        // so gotta make sure we handle them all at once if so..
+        // most of the time the below will only run 1 time
         while (diff !== 0)
         {
-            var modifier = (diff/Math.abs(diff));
-            var nextIndex = curIndex + modifier;
+            var modifier = (diff/Math.abs(diff)); // creates difference modifier (either 1 or -1)
+            var nextIndex = curIndex + modifier; // setup next index based on modifier
 
+            // add (using nextIndex because we are creating new) and set text if any in storage
+            // or remove (using curIndex because we gotta get rid of what we're on)
             if (adding) createTimeslot(nextIndex, before).text( storage.timeSlots[nextIndex] );
             else removeTimeslot(curIndex);
 
-            diff -= modifier;
-            curIndex = nextIndex;
+            diff -= modifier; // update difference by 1 (will march towards 0 either way)
+            curIndex = nextIndex; // update curIndex for next round if any
         }
     }
 });
