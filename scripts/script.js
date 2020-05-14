@@ -108,6 +108,9 @@ timeSliderElm.slider
             diff -= modifier; // update difference by modifier (will march towards 0 either way by subtracting)
             curIndex = nextIndex; // update curIndex for next round if any
         }
+
+        // reset listeners (forgot to do this.. OOPS)
+        resetButtonListeners();
     }
 });
 
@@ -126,7 +129,7 @@ initTimeslots();
 // reset button listeners
 resetButtonListeners();
 
-// setup other listener (a test to see firefox local issues, but no go)
+// setup other listener (shouldn't need this?)
 window.addEventListener("beforeunload", function() { saveStorageVars(SAVE_NAME, storage) });
 
 //console.log(now.format("H")); // returns current time in 24 hour format without leading 0
