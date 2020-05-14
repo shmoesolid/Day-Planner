@@ -93,7 +93,7 @@ function createTimeslot(index, insertBefore = false)
     else containerElm.append(slot);
 
     // return our textarea col
-    // might return whole slot later, not needed currently
+    // used for quick adding text
     return areaCol;
 }
 
@@ -123,12 +123,8 @@ function initTimeslots()
         // check if within our time
         if (i >= storage.timeStart && i <= storage.timeEnd)
         {
+            // create slot and add text if any
             createTimeslot(i).text( storage.timeSlots[i] );
-            // create the slot
-            //var textarea = createTimeslot(i);
-
-            // add text if we have anything
-            //textarea.text( storage.timeSlots[i] );
         }
     }
 }
