@@ -18,6 +18,70 @@ var storage =
 // attempt to load from local storage (legit byref in js would be neat)
 storage = loadStorageVars(SAVE_NAME, storage);
 
+// timer object for updating colors
+var timerObj = 
+{
+    // properties
+    handle: null,
+    intervals: [ 2700, 1800, 900, 300, 60, 30, 15, 10, 5, 2 ], // in seconds (45min to 2sec)
+
+    // update method
+    update: function()
+    {
+        // update global now var
+        now = moment();
+
+        // set current to first
+        // using timerObj instead of 'this' because setTimeout doesn't like 'this'
+        var curInterval = timerObj.intervals[0];
+
+        // get the difference of current minute and make into seconds
+        var curMin = parseInt(now.format("m"));
+        var secDiff = (curMin == 59) // check if we are in the last minute of the hour
+            ? (60 - parseInt(now.format("s")))  // we are in lasat min, use seconds instead of minutes
+            : ((60 - curMin)*60); // convert our min into seconds
+
+        // go through and get a decent length of time for the next timeout
+        // no point in running interval every second the whole hour
+        // i could have just done a time difference and run the interval once
+        // but where is the fun in that
+        for(var i = 0; i < timerObj.intervals.length; i++ ) 
+        {
+            curInterval = timerObj.intervals[i]; // set current
+            if (curInterval < secDiff) break; // break out if we good early
+        }
+
+        // set our compare vars
+        var holdHour = parseInt(moment(storage.date).format("H"));
+        var curHour = parseInt(now.format("H"));
+
+        // update the colors
+        if (holdHour != curHour)
+        {
+            // update colors for both
+            updateColor(holdHour); // changes to red to grey
+            updateColor(curHour); // changes from green to red
+
+            // update storage date to now and save
+            storage.date = now;
+            saveStorageVars(SAVE_NAME, storage);
+        }
+
+        // set our next timeout (converted to ms minus 1 second for grins)
+        //console.log("Next update in " + (curInterval-1) + " seconds..")
+        timerObj.handle = setTimeout(timerObj.update, ((curInterval - 1) * 1000));
+    },
+
+    // stop timer method
+    stop: function()
+    {
+        // clear and make null
+        clearTimeout(timerObj.handle);
+        timerObj.handle = null;
+        //console.log("Stopped updates..");
+    }
+};
+
 // element references
 var currentDayElm = $('#currentDay');
 var containerElm = $('#timeContainer');
@@ -57,8 +121,7 @@ timeSliderElm.slider
          * i had an idea and ran with it, below = result ..
          * i was simply re-initializing timeslots every slider
          * change with initTimeslots() but that's not a good way
-         * of doing things even though its still quick to the eye
-         * and probably would have been an 'A' still on the homework,
+         * of doing things even though its still quick to the eye,
          * the below *should* be much faster in execution .. honestly
          * i doubt anyone even sees or cares about these comments or 
          * the coolguy logic behind the code, only the result :D
@@ -109,7 +172,7 @@ timeSliderElm.slider
             curIndex = nextIndex; // update curIndex for next round if any
         }
 
-        // reset listeners (forgot to do this.. OOPS)
+        // reset listeners
         resetButtonListeners();
     }
 });
@@ -129,8 +192,8 @@ initTimeslots();
 // reset button listeners
 resetButtonListeners();
 
-// setup other listener (shouldn't need this?)
-window.addEventListener("beforeunload", function() { saveStorageVars(SAVE_NAME, storage) });
+// set reset listener
+$('#reset').on("click", reset);
 
-//console.log(now.format("H")); // returns current time in 24 hour format without leading 0
-//console.log(_convertTo12Hour(now.format("H")));
+// start updating our timer for coloring changes
+timerObj.update();

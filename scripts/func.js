@@ -92,6 +92,9 @@ function createTimeslot(index, insertBefore = false)
     if (insertBefore) containerElm.prepend(slot);
     else containerElm.append(slot);
 
+    // update the color
+    updateColor(index);
+
     // return our textarea col
     // used for quick adding text
     return areaCol;
@@ -130,6 +133,27 @@ function initTimeslots()
 }
 
 /////////////////////////////////////////////////////////////////////////
+/** updates color of textarea in time slot based on time
+ * 
+ * @param {int} index 
+ */
+function updateColor(index)
+{
+    // get textarea element and strip all classes
+    var textarea = $("#"+index).children('textarea');
+    textarea.removeClass();
+
+    // setup some vars
+    var slotHour = index;
+    var curHour = parseInt(now.format("H"));
+
+    // compare and set color to textarea
+    if (slotHour < curHour) textarea.addClass("past");
+    else if (slotHour > curHour) textarea.addClass("future");
+    else textarea.addClass("present");
+}
+
+/////////////////////////////////////////////////////////////////////////
 /** simply removes listeners from class then resets it back
  * 
  * this is for when timeslots are dynamically removed and
@@ -149,11 +173,9 @@ function resetButtonListeners()
         var parent = $(this).parent();
 
         // get time slot index from parent id of button
+        // and get textarea input element
         var timeIndex = parent.attr('id');
-        console.log(timeIndex);
-
         var input = parent.children('textarea');
-        console.log(input.val());
 
         // set storage time slot text
         storage.timeSlots[ timeIndex ] = input.val();
@@ -161,4 +183,19 @@ function resetButtonListeners()
         // save them
         saveStorageVars(SAVE_NAME, storage);
     });
+}
+
+/////////////////////////////////////////////////////////////////////////
+/** resets all and reloads page
+ * 
+ */
+function reset()
+{
+    // make sure
+    if (!confirm("Are you sure you want to reset?\n\nThis will clear all data and set defaults.")) 
+        return;
+
+    // clear and reload
+    localStorage.removeItem(SAVE_NAME);
+    location.reload();
 }
